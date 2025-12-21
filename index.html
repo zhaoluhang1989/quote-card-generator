@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金句卡片生成器 - Created by 心道</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: 'Noto Serif SC', serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            padding: 16px 24px;
+            font-size: 18px;
+            font-family: 'Noto Serif SC', serif;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 300px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #f5af19;
+            box-shadow: 0 0 30px rgba(245, 175, 25, 0.3);
+        }
+
+        .btn {
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Noto Serif SC', serif;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(241, 39, 17, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(241, 39, 17, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        #svg-wrapper {
+            border-radius: 24px;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #f5af19;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: none;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .api-key-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-key-section label {
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .api-key-section input {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .api-key-section a {
+            color: #f5af19;
+            text-decoration: none;
+        }
+
+        .api-key-section a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            opacity: 0.6;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid rgba(255, 59, 48, 0.5);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        /* 预设主题色 */
+        .theme-presets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .theme-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .theme-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 金句卡片生成器</h1>
+            <p class="subtitle">输入书名，AI 为您生成精美的金句卡片</p>
+        </header>
+
+        <div class="api-key-section">
+            <label>🔑 Gemini API Key（<a href="https://aistudio.google.com/apikey" target="_blank">点击获取</a>）</label>
+            <input type="text" id="apiKey" placeholder="请输入您的 Gemini API Key" />
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="bookName" placeholder="请输入书名，如：活着" />
+                <button class="btn btn-primary" id="generateBtn" onclick="generateCard()">
+                    ✨ 生成卡片
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-presets">
+            <span class="theme-chip" onclick="setBook('活着')">活着</span>
+            <span class="theme-chip" onclick="setBook('百年孤独')">百年孤独</span>
+            <span class="theme-chip" onclick="setBook('小王子')">小王子</span>
+            <span class="theme-chip" onclick="setBook('围城')">围城</span>
+            <span class="theme-chip" onclick="setBook('红楼梦')">红楼梦</span>
+            <span class="theme-chip" onclick="setBook('战争与和平')">战争与和平</span>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="card-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">AI 正在为您创作金句卡片...</p>
+            </div>
+
+            <div id="svg-wrapper"></div>
+
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn btn-download" onclick="downloadAsPNG()">
+                    📥 下载 PNG 图片
+                </button>
+                <button class="btn btn-primary" onclick="generateCard()">
+                    🔄 重新生成
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created by 心道 | Powered by Gemini AI</p>
+        </footer>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // 主题配色方案
+        const themeColors = {
+            '苦难': { colors: ['#3D2914', '#5D4E37', '#6B7B8C', '#87969B'], accent: '#DAA520' },
+            '爱情': { colors: ['#2C3E50', '#E84393', '#FF7F50', '#FFD700'], accent: '#FF69B4' },
+            '战争': { colors: ['#1a1a2e', '#4a1942', '#c44b6c', '#ff6b6b'], accent: '#FFD700' },
+            '和平': { colors: ['#0d1b2a', '#1b263b', '#415a77', '#778da9'], accent: '#87CEEB' },
+            '孤独': { colors: ['#0f0f23', '#1a1a3e', '#2d2d5a', '#4a4a7a'], accent: '#9370DB' },
+            '童话': { colors: ['#1a1a40', '#3d2c8d', '#5c4d91', '#8b7dc3'], accent: '#FFD700' },
+            '哲理': { colors: ['#0d1b2a', '#1b263b', '#2d4a3e', '#3d6a5a'], accent: '#98FB98' },
+            '历史': { colors: ['#2c1810', '#4a2c1a', '#6b4423', '#8b5a2b'], accent: '#CD853F' },
+            '默认': { colors: ['#1a1a2e', '#302b63', '#483d8b', '#6a5acd'], accent: '#FFD700' }
+        };
+
+        // 图形模板
+        const graphicTemplates = {
+            '麦穗': `<symbol id="theme-graphic" viewBox="0 0 40 100">
+                <path d="M20,100 L20,30" stroke="url(#accent-gradient)" stroke-width="2" fill="none"/>
+                <ellipse cx="20" cy="25" rx="4" ry="10" fill="url(#accent-gradient)"/>
+                <ellipse cx="12" cy="35" rx="4" ry="8" fill="url(#accent-gradient)" transform="rotate(-20 12 35)"/>
+                <ellipse cx="28" cy="35" rx="4" ry="8" fill="url(#accent-gradient)" transform="rotate(20 28 35)"/>
+                <ellipse cx="10" cy="50" rx="3" ry="7" fill="url(#accent-gradient)" transform="rotate(-25 10 50)"/>
+                <ellipse cx="30" cy="50" rx="3" ry="7" fill="url(#accent-gradient)" transform="rotate(25 30 50)"/>
+            </symbol>`,
+            '心形': `<symbol id="theme-graphic" viewBox="-15 -15 30 30">
+                <path d="M0,-5 C-5,-10 -10,-5 -10,0 C-10,5 0,10 0,10 C0,10 10,5 10,0 C10,-5 5,-10 0,-5" 
+                      fill="url(#accent-gradient)" opacity="0.6"/>
+            </symbol>`,
+            '星星': `<symbol id="theme-graphic" viewBox="0 0 50 50">
+                <path d="M25,0 L30,20 L50,25 L30,30 L25,50 L20,30 L0,25 L20,20 Z" 
+                      fill="url(#accent-gradient)" opacity="0.5"/>
+            </symbol>`,
+            '莲花': `<symbol id="theme-graphic" viewBox="-30 -30 60 60">
+                <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#accent-gradient)" opacity="0.6"/>
+                <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#accent-gradient)" opacity="0.5" transform="rotate(36)"/>
+                <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#accent-gradient)" opacity="0.4" transform="rotate(72)"/>
+                <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#accent-gradient)" opacity="0.5" transform="rotate(108)"/>
+                <ellipse cx="0" cy="0" rx="8" ry="20" fill="url(#accent-gradient)" opacity="0.6" transform="rotate(144)"/>
+            </symbol>`,
+            '书本': `<symbol id="theme-graphic" viewBox="0 0 60 50">
+                <path d="M30,10 L5,15 L5,45 L30,40 L55,45 L55,15 Z" 
+                      fill="none" stroke="url(#accent-gradient)" stroke-width="2" opacity="0.5"/>
+                <path d="M30,10 L30,40" stroke="url(#accent-gradient)" stroke-width="1" opacity="0.5"/>
+            </symbol>`
+        };
+
+        function setBook(name) {
+            document.getElementById('bookName').value = name;
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => errorEl.style.display = 'none', 5000);
+        }
+
+        async function generateCard() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const bookName = document.getElementById('bookName').value.trim();
+
+            if (!apiKey) {
+                showError('请输入 Gemini API Key');
+                return;
+            }
+
+            if (!bookName) {
+                showError('请输入书名');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            const svgWrapper = document.getElementById('svg-wrapper');
+            const actionButtons = document.getElementById('actionButtons');
+
+            generateBtn.disabled = true;
+            loading.style.display = 'flex';
+            svgWrapper.style.display = 'none';
+            actionButtons.style.display = 'none';
+
+            try {
+                const prompt = `你是一位文学金句提取专家。请根据书名《${bookName}》，提取一句最具代表性的金句，并返回以下 JSON 格式（不要包含 markdown 代码块标记）：
+
+{
+    "quote": "金句内容（15-40字，可以分成2-3个短句）",
+    "keyword": "金句中最核心的1-2个词",
+    "author": "作者名",
+    "theme": "主题类型（从以下选择一个：苦难/爱情/战争/和平/孤独/童话/哲理/历史）",
+    "graphic": "装饰图形（从以下选择一个：麦穗/心形/星星/莲花/书本）",
+    "lines": ["第一行文字", "第二行文字", "第三行文字（可选）"]
+}
+
+注意：
+1. 金句要有深度和美感
+2. lines 数组中，包含关键词的那一行，关键词前后分开，方便后续标记
+3. 每行控制在 12 字以内
+4. 只返回 JSON，不要其他内容`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.8 }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API 请求失败，请检查 API Key 是否正确');
+                }
+
+                const data = await response.json();
+                let text = data.candidates[0].content.parts[0].text;
+
+                // 清理 markdown 代码块标记
+                text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+                const result = JSON.parse(text);
+                renderCard(bookName, result);
+
+            } catch (error) {
+                console.error(error);
+                showError('生成失败：' + error.message);
+            } finally {
+                generateBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderCard(bookName, data) {
+            const theme = themeColors[data.theme] || themeColors['默认'];
+            const graphic = graphicTemplates[data.graphic] || graphicTemplates['星星'];
+
+            // 处理文字行，标记关键词
+            const lines = data.lines.map(line => {
+                if (line.includes(data.keyword)) {
+                    return line.replace(data.keyword, `<tspan font-size="69">${data.keyword}</tspan>`);
+                }
+                return line;
+            });
+
+            const svg = `
+            <svg id="quote-card" width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <style type="text/css">
+                        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+                        text { font-family: 'Noto Serif SC', serif; }
+                    </style>
+
+                    <linearGradient id="bg-gradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" style="stop-color:${theme.colors[0]}"/>
+                        <stop offset="40%" style="stop-color:${theme.colors[1]}"/>
+                        <stop offset="70%" style="stop-color:${theme.colors[2]}"/>
+                        <stop offset="100%" style="stop-color:${theme.colors[3]}"/>
+                    </linearGradient>
+
+                    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:${theme.accent}"/>
+                        <stop offset="100%" style="stop-color:${theme.accent}; stop-opacity:0.6"/>
+                    </linearGradient>
+
+                    <filter id="text-glow">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+                        <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.3"/>
+                        </feComponentTransfer>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+
+                    ${graphic}
+                </defs>
+
+                <!-- 卡片阴影 -->
+                <rect x="120" y="120" width="600" height="600" rx="20" 
+                      fill="#000" opacity="0.5" filter="blur(15px)"/>
+
+                <!-- 背景卡片 -->
+                <rect x="80" y="80" width="600" height="600" rx="20" 
+                      fill="url(#bg-gradient)"/>
+
+                <!-- 装饰图形 -->
+                <use href="#theme-graphic" x="160" y="340" width="50" height="100" opacity="0.3"/>
+                <use href="#theme-graphic" x="560" y="360" width="45" height="90" opacity="0.25"/>
+
+                <!-- 金句文字 -->
+                ${lines.map((line, i) => `
+                <text x="380" y="${220 + i * 80}" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="42" filter="url(#text-glow)">${line}</text>
+                `).join('')}
+
+                <!-- 装饰线 -->
+                <path d="M250 520 L550 520" stroke="${theme.accent}" 
+                      stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
+
+                <!-- 书名 -->
+                <text x="380" y="560" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="24" filter="url(#text-glow)">——《${bookName}》</text>
+
+                <!-- 作者 -->
+                <text x="380" y="595" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="20" filter="url(#text-glow)">${data.author}</text>
+
+                <!-- 署名 -->
+                <text x="380" y="630" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="16" opacity="0.8">Created by 心道</text>
+            </svg>`;
+
+            document.getElementById('svg-wrapper').innerHTML = svg;
+            document.getElementById('svg-wrapper').style.display = 'block';
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+
+        function downloadAsPNG() {
+            const svg = document.getElementById('quote-card');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const scale = 2;
+            canvas.width = 800 * scale;
+            canvas.height = 800 * scale;
+            ctx.scale(scale, scale);
+
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            const img = new Image();
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+
+                const pngUrl = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pngUrl;
+
+                const bookName = document.getElementById('bookName').value.trim();
+                downloadLink.download = `金句卡片_${bookName}.png`;
+
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            };
+            img.src = url;
+        }
+
+        // 回车键触发生成
+        document.getElementById('bookName').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                generateCard();
+            }
+        });
+    </script>
+</body>
+
+</html>
