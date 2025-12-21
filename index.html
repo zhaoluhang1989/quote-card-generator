@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金句卡片生成器 - Created by 心道</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: 'Noto Serif SC', serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            padding: 16px 24px;
+            font-size: 18px;
+            font-family: 'Noto Serif SC', serif;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 300px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #f5af19;
+            box-shadow: 0 0 30px rgba(245, 175, 25, 0.3);
+        }
+
+        .btn {
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Noto Serif SC', serif;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(241, 39, 17, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(241, 39, 17, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        #svg-wrapper {
+            border-radius: 24px;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #f5af19;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: none;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .api-key-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-key-section label {
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .api-key-section input {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .api-key-section a {
+            color: #f5af19;
+            text-decoration: none;
+        }
+
+        .api-key-section a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            opacity: 0.6;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid rgba(255, 59, 48, 0.5);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        /* 预设主题色 */
+        .theme-presets {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .theme-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .theme-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 金句卡片生成器</h1>
+            <p class="subtitle">输入书名，AI 为您生成精美的金句卡片</p>
+        </header>
+
+        <div class="api-key-section">
+            <label>🔑 Gemini API Key（<a href="https://aistudio.google.com/apikey" target="_blank">点击获取</a>）</label>
+            <input type="text" id="apiKey" placeholder="请输入您的 Gemini API Key">
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="bookName" placeholder="请输入书名，如：活着">
+                <button class="btn btn-primary" id="generateBtn" onclick="generateCard()">
+                    ✨ 生成卡片
+                </button>
+            </div>
+        </div>
+
+        <div class="theme-presets">
+            <span class="theme-chip" onclick="setBook('活着')">活着</span>
+            <span class="theme-chip" onclick="setBook('百年孤独')">百年孤独</span>
+            <span class="theme-chip" onclick="setBook('小王子')">小王子</span>
+            <span class="theme-chip" onclick="setBook('围城')">围城</span>
+            <span class="theme-chip" onclick="setBook('红楼梦')">红楼梦</span>
+            <span class="theme-chip" onclick="setBook('战争与和平')">战争与和平</span>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="card-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">AI 正在为您创作金句卡片...</p>
+            </div>
+
+            <div id="svg-wrapper"></div>
+
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn btn-download" onclick="downloadAsPNG()">
+                    📥 下载 PNG 图片
+                </button>
+                <button class="btn btn-primary" onclick="generateCard()">
+                    🔄 重新生成
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created by 心道 | Powered by Gemini AI</p>
+        </footer>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // 主题配色方案
+        const themeColors = {
+            '苦难': { colors: ['#3D2914', '#5D4E37', '#6B7B8C', '#87969B'], accent: '#DAA520' },
+            '爱情': { colors: ['#2C3E50', '#E84393', '#FF7F50', '#FFD700'], accent: '#FF69B4' },
+            '战争': { colors: ['#1a1a2e', '#4a1942', '#c44b6c', '#ff6b6b'], accent: '#FFD700' },
+            '和平': { colors: ['#0d1b2a', '#1b263b', '#415a77', '#778da9'], accent: '#87CEEB' },
+            '孤独': { colors: ['#0f0f23', '#1a1a3e', '#2d2d5a', '#4a4a7a'], accent: '#9370DB' },
+            '童话': { colors: ['#1a1a40', '#3d2c8d', '#5c4d91', '#8b7dc3'], accent: '#FFD700' },
+            '哲理': { colors: ['#0d1b2a', '#1b263b', '#2d4a3e', '#3d6a5a'], accent: '#98FB98' },
+            '历史': { colors: ['#2c1810', '#4a2c1a', '#6b4423', '#8b5a2b'], accent: '#CD853F' },
+            '默认': { colors: ['#1a1a2e', '#302b63', '#483d8b', '#6a5acd'], accent: '#FFD700' }
+        };
+    </script>
+</body></html>
