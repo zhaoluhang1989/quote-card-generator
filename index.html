@@ -307,8 +307,9 @@
     <canvas id="canvas"></canvas>
 
     <script>
-        // 主题配色方案
+        // 主题配色方案 - 16种主题
         const themeColors = {
+            // 原有8种
             '苦难': { colors: ['#3D2914', '#5D4E37', '#6B7B8C', '#87969B'], accent: '#DAA520' },
             '爱情': { colors: ['#2C3E50', '#E84393', '#FF7F50', '#FFD700'], accent: '#FF69B4' },
             '战争': { colors: ['#1a1a2e', '#4a1942', '#c44b6c', '#ff6b6b'], accent: '#FFD700' },
@@ -317,6 +318,15 @@
             '童话': { colors: ['#1a1a40', '#3d2c8d', '#5c4d91', '#8b7dc3'], accent: '#FFD700' },
             '哲理': { colors: ['#0d1b2a', '#1b263b', '#2d4a3e', '#3d6a5a'], accent: '#98FB98' },
             '历史': { colors: ['#2c1810', '#4a2c1a', '#6b4423', '#8b5a2b'], accent: '#CD853F' },
+            // 新增8种
+            '自然': { colors: ['#1a3a1a', '#2d5a2d', '#4a8b4a', '#7cb77c'], accent: '#90EE90' },
+            '科幻': { colors: ['#0a0a1a', '#1a2a4a', '#2a4a7a', '#4a7aaa'], accent: '#00FFFF' },
+            '悲剧': { colors: ['#1a0a0a', '#2a1a1a', '#4a2a2a', '#6a3a3a'], accent: '#DC143C' },
+            '喜剧': { colors: ['#2a2a0a', '#4a4a1a', '#7a7a2a', '#aaaa4a'], accent: '#FFD700' },
+            '冒险': { colors: ['#1a2a1a', '#2a4a3a', '#4a7a5a', '#6aaa7a'], accent: '#32CD32' },
+            '成长': { colors: ['#1a1a2a', '#2a3a4a', '#4a5a7a', '#6a8aaa'], accent: '#87CEEB' },
+            '励志': { colors: ['#2a1a0a', '#4a3a1a', '#7a5a2a', '#aa7a4a'], accent: '#FFA500' },
+            '浪漫': { colors: ['#2a1a2a', '#4a2a4a', '#7a4a7a', '#aa6aaa'], accent: '#FF69B4' },
             '默认': { colors: ['#1a1a2e', '#302b63', '#483d8b', '#6a5acd'], accent: '#FFD700' }
         };
 
@@ -425,7 +435,7 @@
     "quote": "完整金句内容",
     "keyword": "金句中最核心的2-4个字的词语",
     "author": "作者名",
-    "theme": "主题类型（从以下选择一个：苦难/爱情/战争/和平/孤独/童话/哲理/历史）",
+    "theme": "主题类型（从以下选择最匹配的：苦难/爱情/战争/和平/孤独/童话/哲理/历史/自然/科幻/悲剧/喜剧/冒险/成长/励志/浪漫）",
     "graphic": "装饰图形（根据金句意境选择最匹配的：麦穗/心形/星星/莲花/书本/山峰/浪花/城墙/月亮/羽毛/剑/蝴蝶）",
     "lines": ["第一行", "第二行", "第三行（如需要）"]
 }
