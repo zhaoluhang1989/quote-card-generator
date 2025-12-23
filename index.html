@@ -320,7 +320,7 @@
             '默认': { colors: ['#1a1a2e', '#302b63', '#483d8b', '#6a5acd'], accent: '#FFD700' }
         };
 
-        // 图形模板
+        // 图形模板 - 更多创意图形
         const graphicTemplates = {
             '麦穗': `<symbol id="theme-graphic" viewBox="0 0 40 100">
                 <path d="M20,100 L20,30" stroke="url(#accent-gradient)" stroke-width="2" fill="none"/>
@@ -349,6 +349,37 @@
                 <path d="M30,10 L5,15 L5,45 L30,40 L55,45 L55,15 Z" 
                       fill="none" stroke="url(#accent-gradient)" stroke-width="2" opacity="0.5"/>
                 <path d="M30,10 L30,40" stroke="url(#accent-gradient)" stroke-width="1" opacity="0.5"/>
+            </symbol>`,
+            '山峰': `<symbol id="theme-graphic" viewBox="0 0 100 60">
+                <path d="M0,60 L25,20 L40,40 L60,10 L80,35 L100,60 Z" fill="url(#accent-gradient)" opacity="0.4"/>
+            </symbol>`,
+            '浪花': `<symbol id="theme-graphic" viewBox="0 0 100 50">
+                <path d="M0,40 Q10,20 25,40 T50,40 T75,40 T100,40" fill="none" stroke="url(#accent-gradient)" stroke-width="3" opacity="0.5"/>
+                <path d="M0,50 Q15,30 30,50 T60,50 T90,50" fill="none" stroke="url(#accent-gradient)" stroke-width="2" opacity="0.3"/>
+            </symbol>`,
+            '城墙': `<symbol id="theme-graphic" viewBox="0 0 100 60">
+                <path d="M0,60 L0,30 L10,30 L10,20 L20,20 L20,30 L30,30 L30,20 L40,20 L40,30 L50,30 L50,20 L60,20 L60,30 L70,30 L70,20 L80,20 L80,30 L90,30 L90,20 L100,20 L100,60 Z" fill="url(#accent-gradient)" opacity="0.4"/>
+            </symbol>`,
+            '月亮': `<symbol id="theme-graphic" viewBox="0 0 50 50">
+                <circle cx="25" cy="25" r="20" fill="url(#accent-gradient)" opacity="0.5"/>
+                <circle cx="32" cy="20" r="15" fill="url(#bg-gradient)"/>
+            </symbol>`,
+            '羽毛': `<symbol id="theme-graphic" viewBox="0 0 30 80">
+                <path d="M15,0 Q5,20 15,40 Q25,60 15,80" fill="none" stroke="url(#accent-gradient)" stroke-width="2" opacity="0.6"/>
+                <path d="M15,10 Q8,20 15,30" fill="none" stroke="url(#accent-gradient)" stroke-width="1" opacity="0.4"/>
+                <path d="M15,10 Q22,20 15,30" fill="none" stroke="url(#accent-gradient)" stroke-width="1" opacity="0.4"/>
+            </symbol>`,
+            '剑': `<symbol id="theme-graphic" viewBox="0 0 20 80">
+                <path d="M10,0 L15,60 L10,70 L5,60 Z" fill="url(#accent-gradient)" opacity="0.5"/>
+                <rect x="5" y="60" width="10" height="5" fill="url(#accent-gradient)" opacity="0.6"/>
+                <rect x="8" y="65" width="4" height="15" fill="url(#accent-gradient)" opacity="0.4"/>
+            </symbol>`,
+            '蝴蝶': `<symbol id="theme-graphic" viewBox="0 0 60 40">
+                <ellipse cx="15" cy="15" rx="12" ry="10" fill="url(#accent-gradient)" opacity="0.5" transform="rotate(-20 15 15)"/>
+                <ellipse cx="45" cy="15" rx="12" ry="10" fill="url(#accent-gradient)" opacity="0.5" transform="rotate(20 45 15)"/>
+                <ellipse cx="18" cy="28" rx="8" ry="6" fill="url(#accent-gradient)" opacity="0.4" transform="rotate(-10 18 28)"/>
+                <ellipse cx="42" cy="28" rx="8" ry="6" fill="url(#accent-gradient)" opacity="0.4" transform="rotate(10 42 28)"/>
+                <rect x="28" y="5" width="4" height="30" fill="url(#accent-gradient)" opacity="0.6" rx="2"/>
             </symbol>`
         };
 
@@ -388,14 +419,14 @@
             actionButtons.style.display = 'none';
 
             try {
-                const prompt = `你是一位文学金句提取专家。请根据书名《${bookName}》，提取一句最具代表性的金句，并返回以下 JSON 格式（不要包含 markdown 代码块标记）：
+                const prompt = `你是一位文学金句提取专家和视觉设计师。请根据书名《${bookName}》，提取一句最具代表性的金句，并设计配套的视觉元素，返回以下 JSON 格式（不要包含 markdown 代码块标记）：
 
 {
     "quote": "完整金句内容",
     "keyword": "金句中最核心的2-4个字的词语",
     "author": "作者名",
     "theme": "主题类型（从以下选择一个：苦难/爱情/战争/和平/孤独/童话/哲理/历史）",
-    "graphic": "装饰图形（从以下选择一个：麦穗/心形/星星/莲花/书本）",
+    "graphic": "装饰图形（根据金句意境选择最匹配的：麦穗/心形/星星/莲花/书本/山峰/浪花/城墙/月亮/羽毛/剑/蝴蝶）",
     "lines": ["第一行", "第二行", "第三行（如需要）"]
 }
 
@@ -404,7 +435,9 @@
 2. 关键词必须完整出现在某一行中，不要拆分关键词
 3. 关键词所在行的总字数（含关键词）不超过8字
 4. 金句要有深度和美感
-5. 只返回纯JSON，不要任何其他内容`;
+5. graphic 图形要与金句意境高度匹配（如战争选剑/城墙，爱情选心形/蝴蝶，孤独选月亮，历史选城墙等）
+6. theme 主题决定背景渐变色调，请准确判断
+7. 只返回纯JSON，不要任何其他内容`;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
                     method: 'POST',
@@ -518,31 +551,31 @@
                 <rect x="80" y="80" width="600" height="600" rx="20" 
                       fill="url(#bg-gradient)"/>
 
-                <!-- 装饰图形 -->
-                <use href="#theme-graphic" x="160" y="340" width="50" height="100" opacity="0.3"/>
-                <use href="#theme-graphic" x="560" y="360" width="45" height="90" opacity="0.25"/>
+                <!-- 装饰图形 - 金句两侧 -->
+                <use href="#theme-graphic" x="120" y="200" width="60" height="100" opacity="0.25"/>
+                <use href="#theme-graphic" x="600" y="220" width="55" height="90" opacity="0.2"/>
 
-                <!-- 金句文字 -->
+                <!-- 金句文字 - 位于上中位置 -->
                 ${lines.map((line, i) => `
-                <text x="380" y="${quoteStartY + i * lineHeight}" text-anchor="middle" fill="#FFFFFF" 
+                <text x="380" y="${180 + i * lineHeight}" text-anchor="middle" fill="#FFFFFF" 
                       font-size="38" filter="url(#text-glow)">${line}</text>
                 `).join('')}
 
-                <!-- 装饰线 -->
-                <path d="M250 ${quoteStartY + lineCount * lineHeight + 60} L550 ${quoteStartY + lineCount * lineHeight + 60}" stroke="${theme.accent}" 
+                <!-- 装饰线 - 固定位置 -->
+                <path d="M200 520 L560 520" stroke="${theme.accent}" 
                       stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
 
-                <!-- 书名 -->
-                <text x="380" y="${quoteStartY + lineCount * lineHeight + 100}" text-anchor="middle" fill="#FFFFFF" 
+                <!-- 书名 - 固定在卡片下方 -->
+                <text x="380" y="560" text-anchor="middle" fill="#FFFFFF" 
                       font-size="24" filter="url(#text-glow)">——《${bookName}》</text>
 
-                <!-- 作者 -->
-                <text x="380" y="${quoteStartY + lineCount * lineHeight + 135}" text-anchor="middle" fill="#FFFFFF" 
+                <!-- 作者 - 固定位置 -->
+                <text x="380" y="595" text-anchor="middle" fill="#FFFFFF" 
                       font-size="20" filter="url(#text-glow)">${data.author}</text>
 
-                <!-- 署名 -->
-                <text x="380" y="630" text-anchor="middle" fill="#FFFFFF" 
-                      font-size="16" opacity="0.8">Created by 心道</text>
+                <!-- 署名 - 固定在底部 -->
+                <text x="380" y="640" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="16" opacity="0.7">Created by 心道</text>
             </svg>`;
 
             document.getElementById('svg-wrapper').innerHTML = svg;
