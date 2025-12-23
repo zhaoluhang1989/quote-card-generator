@@ -551,31 +551,37 @@
                 <rect x="80" y="80" width="600" height="600" rx="20" 
                       fill="url(#bg-gradient)"/>
 
-                <!-- 装饰图形 - 金句两侧 -->
-                <use href="#theme-graphic" x="120" y="200" width="60" height="100" opacity="0.25"/>
-                <use href="#theme-graphic" x="600" y="220" width="55" height="90" opacity="0.2"/>
+                <!-- 装饰图形 - 金句两侧居中 -->
+                <use href="#theme-graphic" x="100" y="280" width="55" height="90" opacity="0.2"/>
+                <use href="#theme-graphic" x="610" y="300" width="50" height="80" opacity="0.15"/>
 
-                <!-- 金句文字 - 位于上中位置 -->
-                ${lines.map((line, i) => `
-                <text x="380" y="${180 + i * lineHeight}" text-anchor="middle" fill="#FFFFFF" 
-                      font-size="38" filter="url(#text-glow)">${line}</text>
-                `).join('')}
+                <!-- 金句文字 - 垂直居中于卡片中心区域 (y: 200-450) -->
+                ${(() => {
+                    // 计算金句区域的垂直居中位置
+                    const cardCenterY = 330; // 卡片中心区域的中点
+                    const totalHeight = lineCount * lineHeight;
+                    const startY = cardCenterY - totalHeight / 2 + lineHeight / 2;
+                    return lines.map((line, i) => `
+                <text x="380" y="${startY + i * lineHeight}" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="40" filter="url(#text-glow)">${line}</text>
+                    `).join('');
+                })()}
 
-                <!-- 装饰线 - 固定位置 -->
-                <path d="M200 520 L560 520" stroke="${theme.accent}" 
-                      stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
+                <!-- 装饰线 - 金句与署名区之间 -->
+                <path d="M200 500 L560 500" stroke="${theme.accent}" 
+                      stroke-width="1.5" stroke-dasharray="8,4" opacity="0.4"/>
 
                 <!-- 书名 - 固定在卡片下方 -->
-                <text x="380" y="560" text-anchor="middle" fill="#FFFFFF" 
+                <text x="380" y="545" text-anchor="middle" fill="#FFFFFF" 
                       font-size="24" filter="url(#text-glow)">——《${bookName}》</text>
 
                 <!-- 作者 - 固定位置 -->
-                <text x="380" y="595" text-anchor="middle" fill="#FFFFFF" 
-                      font-size="20" filter="url(#text-glow)">${data.author}</text>
+                <text x="380" y="585" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="20" opacity="0.9" filter="url(#text-glow)">${data.author}</text>
 
                 <!-- 署名 - 固定在底部 -->
-                <text x="380" y="640" text-anchor="middle" fill="#FFFFFF" 
-                      font-size="16" opacity="0.7">Created by 心道</text>
+                <text x="380" y="635" text-anchor="middle" fill="#FFFFFF" 
+                      font-size="14" opacity="0.6">Created by 心道</text>
             </svg>`;
 
             document.getElementById('svg-wrapper').innerHTML = svg;
